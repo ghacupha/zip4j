@@ -10,7 +10,7 @@ import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.model.enums.CompressionMethod;
 import net.lingala.zip4j.model.enums.EncryptionMethod;
 import net.lingala.zip4j.progress.ProgressMonitor;
-import net.lingala.zip4j.tasks.RemoveEntryFromZipFileTask.RemoveEntryFromZipFileTaskParameters;
+import net.lingala.zip4j.tasks.RemoveFilesFromZipTask.RemoveFilesFromZipTaskParameters;
 import net.lingala.zip4j.util.BitUtils;
 import net.lingala.zip4j.util.FileUtils;
 import net.lingala.zip4j.util.InternalZipConstants;
@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static net.lingala.zip4j.headers.HeaderUtil.getFileHeader;
@@ -262,10 +263,10 @@ public abstract class AbstractAddFileToZipTask<T> extends AsyncZipTask<T> {
     return filesToAdd;
   }
 
-  private void removeFile(FileHeader fileHeader, ProgressMonitor progressMonitor, Charset charset) throws ZipException {
+  void removeFile(FileHeader fileHeader, ProgressMonitor progressMonitor, Charset charset) throws ZipException {
     AsyncTaskParameters asyncTaskParameters = new AsyncTaskParameters(null, false, progressMonitor);
-    RemoveEntryFromZipFileTask removeEntryFromZipFileTask = new RemoveEntryFromZipFileTask(zipModel, asyncTaskParameters);
-    removeEntryFromZipFileTask.execute(new RemoveEntryFromZipFileTaskParameters(fileHeader, charset));
+    RemoveFilesFromZipTask removeFilesFromZipTask = new RemoveFilesFromZipTask(zipModel, headerWriter, asyncTaskParameters);
+    removeFilesFromZipTask.execute(new RemoveFilesFromZipTaskParameters(Collections.singletonList(fileHeader.getFileName()), charset));
   }
 
   private String replaceFileNameInZip(String fileInZipWithPath, String newFileName) {
